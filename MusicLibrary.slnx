@@ -2,5 +2,6 @@
   <Project Path="Application/MusicLibrary.Application.csproj" />
   <Project Path="Domain/MusicLibrary.Domain.csproj" />
   <Project Path="Infrastructure/MusicLibrary.Infrastructure.csproj" />
+  <Project Path="MusicLibrary.Tests/MusicLibrary.Tests.csproj" Id="b7863e66-629a-45bb-b44b-e98043f67bf9" />
   <Project Path="WebAPI/MusicLibrary.WebAPI.csproj" />
 </Solution>
