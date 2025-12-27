@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="Application/Application.csproj" />
-  <Project Path="Domain/Domain.csproj" />
-  <Project Path="Infrastructure/Infrastructure.csproj" />
-  <Project Path="WebAPI/WebAPI.csproj" />
+  <Project Path="Application/MusicLibrary.Application.csproj" />
+  <Project Path="Domain/MusicLibrary.Domain.csproj" />
+  <Project Path="Infrastructure/MusicLibrary.Infrastructure.csproj" />
+  <Project Path="WebAPI/MusicLibrary.WebAPI.csproj" />
 </Solution>
