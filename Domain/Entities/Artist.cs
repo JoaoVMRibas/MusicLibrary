@@ -20,18 +20,30 @@ public class Artist
         Name = name;
     }
 
-    public void AddAlbum(string name)
+    public Album AddAlbum(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("The album name cannot be null or empty.", nameof(name));
+        if (_albums.Any(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("Album with the same name already exists.");
 
-        _albums.Add(new Album(name));
+        var album = new Album(name);
+        _albums.Add(album);
+        return album;
     }
-    public void AddMusic(string name) 
+    public Music AddMusic(string name, TimeSpan duration) 
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("The music name cannot be null or empty.", nameof(name));
+        if (_musics.Any(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("Music with the same name already exists.");
 
-        _musics.Add(new Music(name));
+        var music = new Music(name, duration);
+        _musics.Add(music);
+        return music;
+    }
+
+    public void AddMusicToAlbum(Guid albumId, Guid musicId)
+    {
+        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
+        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new InvalidOperationException("Music not found.");
+
+        album.AddMusic(music);
     }
 }

@@ -14,9 +14,8 @@ public class ArtistTests
         var artist = new Artist(name);
 
         //Assert
-        Assert.NotNull(artist);
-        Assert.Equal(name, artist.Name);
         Assert.NotEqual(Guid.Empty, artist.Id);
+        Assert.Equal(name, artist.Name);
     }
 
     [Fact]
@@ -29,25 +28,26 @@ public class ArtistTests
         var exception = Assert.Throws<ArgumentException>(() => new Artist(name));
 
         //Assert
-        Assert.Equal("name",exception.ParamName);
+        Assert.Equal("name", exception.ParamName);
         Assert.Contains("cannot be null or empty.", exception.Message);
     }
 
     [Fact]
-    public void Should_Create_Music_With_Valid_Name()
+    public void Should_Add_Music_To_Artist_When_Data_Is_Valid()
     {
         //Arrange
         var artist = new Artist("Metallica");
         var musicName = "Nothing Else Matters";
+        TimeSpan duration = TimeSpan.FromSeconds(386);
 
         //Act
-        artist.AddMusic(musicName);
-        var music = artist.Musics.First();
+        var music = artist.AddMusic(musicName, duration);
 
         //Assert
         Assert.Single(artist.Musics);
-        Assert.NotEqual(Guid.Empty,music.Id);
+        Assert.NotEqual(Guid.Empty, music.Id);
         Assert.Equal(musicName, music.Name);
+        Assert.Equal(duration, music.Duration);
     }
 
     [Fact]
@@ -56,9 +56,10 @@ public class ArtistTests
         //Arrange
         var artist = new Artist("Metallica");
         var musicName = "";
+        TimeSpan duration = TimeSpan.FromSeconds(386);
 
         //Act
-        var exception = Assert.Throws<ArgumentException>(() => artist.AddMusic(musicName));
+        var exception = Assert.Throws<ArgumentException>(() => artist.AddMusic(musicName, duration));
 
         //Assert
         Assert.Empty(artist.Musics);
@@ -67,15 +68,31 @@ public class ArtistTests
     }
 
     [Fact]
-    public void Should_Create_Album_With_Valid_Name()
+    public void Should_Throw_Exception_When_Adding_Music_With_Invalid_Duration()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var musicName = "Nothing Else Matters";
+        TimeSpan duration = TimeSpan.FromSeconds(0);
+
+        //Act
+        var exception = Assert.Throws<ArgumentException>(() => artist.AddMusic(musicName, duration));
+
+        //Assert
+        Assert.Empty(artist.Musics);
+        Assert.Equal("duration", exception.ParamName);
+        Assert.Contains("cannot be equal to or less than zero.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Add_Album_To_Artist_When_Data_Is_Valid()
     {
         //Arrange
         var artist = new Artist("Metallica");
         var albumName = "Master of Puppets";
 
         //Act
-        artist.AddAlbum(albumName);
-        var album = artist.Albums.First();
+        var album = artist.AddAlbum(albumName);
 
         //Assert
         Assert.Single(artist.Albums);
@@ -97,5 +114,118 @@ public class ArtistTests
         Assert.Empty(artist.Albums);
         Assert.Equal("name", exception.ParamName);
         Assert.Contains("cannot be null or empty.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Add_Music_To_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+
+        //Act
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        //Assert
+        Assert.Single(artist.Albums);
+        Assert.Single(album.Musics);
+        Assert.Contains(album.Musics, m => m.Id == music.Id);
+    }
+
+    [Fact]
+    public void Should_Throw_Exception_When_Adding_Nonexistent_Music_To_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+
+        //Act
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(album.Id, Guid.NewGuid()));
+
+        //Assert
+        Assert.Empty(album.Musics);
+        Assert.Contains("Music not found.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Throw_Exception_When_Adding_Music_To_Nonexistent_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+
+        //Act
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(Guid.NewGuid(), music.Id));
+
+        //Assert
+        Assert.Contains("Album not found.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Not_Allow_Same_Music_Twice_In_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+
+        //Act
+        artist.AddMusicToAlbum(album.Id, music.Id);
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(album.Id, music.Id));
+
+        //Assert
+        Assert.Single(album.Musics);
+        Assert.Contains("Music already added to album.", exception.Message);
+    }
+
+    [Fact]
+    public void Album_Duration_Should_Be_Sum_Of_All_Music_Durations()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+        var music2 = artist.AddMusic("The Unforgiven", TimeSpan.FromSeconds(387));
+
+        //Act
+        artist.AddMusicToAlbum(album.Id, music.Id);
+        artist.AddMusicToAlbum(album.Id, music2.Id);
+
+        //Assert
+        Assert.Equal(TimeSpan.FromSeconds(718), album.Duration);
+    }
+
+    [Fact]
+    public void Should_Not_Allow_Creating_Album_With_Duplicated_Name()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+
+        //Act
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddAlbum("The Black Album"));
+
+        //Assert
+        Assert.Single(artist.Albums);
+        Assert.Contains("Album with the same name already exists.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Not_Allow_Creating_Music_With_Duplicated_Name()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+
+        //Act
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331)));
+
+        //Assert
+        Assert.Single(artist.Musics);
+        Assert.Contains("Music with the same name already exists.", exception.Message);
     }
 }
