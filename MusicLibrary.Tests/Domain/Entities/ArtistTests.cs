@@ -22,10 +22,40 @@ public class ArtistTests
     public void Should_Throw_Exception_When_Name_Is_Null_Or_Empty()
     {
         //Arrange
-        var name = "";
+        var name = string.Empty;
 
         //Act and Assert
         var exception = Assert.Throws<ArgumentException>(() => new Artist(name));
+
+        //Assert
+        Assert.Equal("name", exception.ParamName);
+        Assert.Contains("cannot be null or empty.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Update_Artist_Name_With_New_Valid_Name()
+    {
+        //Arrange
+        var name = "Metallica";
+
+        //Act
+        var artist = new Artist(name);
+        artist.UpdateName("Guns");
+
+        //Assert
+        Assert.NotEqual(Guid.Empty, artist.Id);
+        Assert.Equal("Guns", artist.Name);
+    }
+
+    [Fact]
+    public void Should_Throw_Exception_When_Updated_New_Name_Is_Null_Or_Empty()
+    {
+        //Arrange
+        var name = "Metallica";
+        var artist = new Artist(name);
+
+        //Act and Assert
+        var exception = Assert.Throws<ArgumentException>(() => artist.UpdateName(string.Empty));
 
         //Assert
         Assert.Equal("name", exception.ParamName);
@@ -55,7 +85,7 @@ public class ArtistTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var musicName = "";
+        var musicName = string.Empty;
         TimeSpan duration = TimeSpan.FromSeconds(386);
 
         //Act
@@ -105,7 +135,7 @@ public class ArtistTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var albumName = "";
+        var albumName = string.Empty;
 
         //Act
         var exception = Assert.Throws<ArgumentException>(() => artist.AddAlbum(albumName));

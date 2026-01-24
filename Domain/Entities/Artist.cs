@@ -20,6 +20,14 @@ public class Artist
         Name = name;
     }
 
+    public void UpdateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("The artist's name cannot be null or empty.", nameof(name));
+
+        Name = name; 
+    }
+
     public Album AddAlbum(string name)
     {
         if (_albums.Any(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
