@@ -179,7 +179,7 @@ public class ArtistServiceTests
         var service = new ArtistService(repository);
 
         var artist = new Artist("Metallica");
-        var request = new UpdateArtistRequest(artist.Id, "");
+        var request = new UpdateArtistRequest(artist.Id, string.Empty);
 
         repository.GetByIdAsync(artist.Id).Returns(artist);
 
@@ -189,6 +189,27 @@ public class ArtistServiceTests
         //Assert
         Assert.Equal("name", exception.ParamName);
         Assert.Contains("The artist's name cannot be null or empty.", exception.Message);
+
+        await repository.DidNotReceive().UpdateAsync(Arg.Any<Artist>());
+    }
+
+    [Fact]
+    public async Task UpdateAsync_Should_Throw_When_Updated_Name_Is_The_Same_As_The_Actual_Name()
+    {
+        //Arrange
+        var repository = Substitute.For<IArtistRepository>();
+        var service = new ArtistService(repository);
+
+        var artist = new Artist("Metallica");
+        var request = new UpdateArtistRequest(artist.Id, "Metallica");
+
+        repository.GetByIdAsync(artist.Id).Returns(artist);
+
+        //Act
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateAsync(request));
+
+        //Assert
+        Assert.Contains("The artist already has this name.", exception.Message);
 
         await repository.DidNotReceive().UpdateAsync(Arg.Any<Artist>());
     }

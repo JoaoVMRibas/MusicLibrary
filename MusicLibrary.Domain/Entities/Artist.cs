@@ -25,6 +25,9 @@ public class Artist
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The artist's name cannot be null or empty.", nameof(name));
 
+        if (Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("The artist already has this name.");
+
         Name = name; 
     }
 

@@ -63,6 +63,20 @@ public class ArtistTests
     }
 
     [Fact]
+    public void Should_Throw_Exception_When_Updated_New_Name_Is_Equal_To_Actual_Name()
+    {
+        //Arrange
+        var name = "Metallica";
+        var artist = new Artist(name);
+
+        //Act and Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => artist.UpdateName("Metallica"));
+
+        //Assert
+        Assert.Contains("The artist already has this name.", exception.Message);
+    }
+
+    [Fact]
     public void Should_Add_Music_To_Artist_When_Data_Is_Valid()
     {
         //Arrange
