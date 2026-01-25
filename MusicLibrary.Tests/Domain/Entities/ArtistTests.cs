@@ -161,6 +161,35 @@ public class ArtistTests
     }
 
     [Fact]
+    public void Should_Remove_Album_From_Artist_When_Album_Is_Found()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("Master of Puppets");
+
+        //Act and Assert
+        Assert.Single(artist.Albums);
+        artist.RemoveAlbum(album.Id);
+        Assert.Empty(artist.Albums);
+    }
+
+    [Fact]
+    public void Should_Throw_Exception_When_Removing_Nonexistent_Album_From_Artist()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("Master of Puppets");
+
+        //Act and Assert
+        var exception = Assert.Throws<InvalidOperationException>(()=> artist.RemoveAlbum(Guid.NewGuid()));
+
+        //Assert
+        Assert.Single(artist.Albums);
+        Assert.Contains("Album not found.", exception.Message);
+    }
+
+
+    [Fact]
     public void Should_Add_Music_To_Album()
     {
         //Arrange

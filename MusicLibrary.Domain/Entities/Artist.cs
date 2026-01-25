@@ -40,6 +40,14 @@ public class Artist
         _albums.Add(album);
         return album;
     }
+
+    public void RemoveAlbum(Guid albumId)
+    {
+        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
+
+        _albums.Remove(album);
+    }
+
     public Music AddMusic(string name, TimeSpan duration) 
     {
         if (_musics.Any(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
