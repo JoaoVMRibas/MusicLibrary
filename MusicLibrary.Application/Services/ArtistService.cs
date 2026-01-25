@@ -34,7 +34,7 @@ public class ArtistService : IArtistService
     {
         var artist = await _artistRepository.GetByIdAsync(id);
 
-        if(artist == null) return null;
+        if(artist == null) throw new InvalidOperationException("Artist not found.");
 
         return new ArtistDto(artist.Id,artist.Name);
     }
