@@ -1,8 +1,10 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
+using MusicLibrary.Application.Exceptions;
 using MusicLibrary.Application.Requests.Music;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
+using MusicLibrary.Domain.Exceptions;
 using NSubstitute;
 
 namespace MusicLibrary.Tests.Application.Services;
@@ -34,7 +36,7 @@ public class MusicServiceTests
         Assert.Single(artist.Musics);
         Assert.NotEqual(Guid.NewGuid(), response.Id);
         Assert.Equal("Fade to Black", response.Name);
-        Assert.Equal(TimeSpan.FromSeconds(415),response.Duration);
+        Assert.Equal(TimeSpan.FromSeconds(415), response.Duration);
 
         await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
     }
@@ -48,7 +50,7 @@ public class MusicServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _musicService.CreateMusicAsync(request));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _musicService.CreateMusicAsync(request));
 
         //Assert
         Assert.Contains("Artist not found", exception.Message);
@@ -62,7 +64,7 @@ public class MusicServiceTests
         //Arrage
         var artist = new Artist("Metallica");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new GetMusicByIdRequest(artist.Id,music.Id);
+        var request = new GetMusicByIdRequest(artist.Id, music.Id);
 
         _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
 
@@ -86,7 +88,7 @@ public class MusicServiceTests
         _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _musicService.GetMusicByIdAsync(request));
+        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.GetMusicByIdAsync(request));
 
         //Assert
         Assert.Contains("Music not found", exception.Message);
@@ -120,7 +122,7 @@ public class MusicServiceTests
         //Arrage
         var artist = new Artist("Metallica");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new DeleteMusicRequest(artist.Id,music.Id);
+        var request = new DeleteMusicRequest(artist.Id, music.Id);
 
         _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
 
@@ -142,7 +144,7 @@ public class MusicServiceTests
         _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _musicService.DeleteMusicAsync(request));
+        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.DeleteMusicAsync(request));
 
         //Assert
         Assert.Contains("Music not found", exception.Message);
@@ -157,7 +159,7 @@ public class MusicServiceTests
         var artist = new Artist("Metallica");
         var album = artist.AddAlbum("Ride the Lightning");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new AddMusicToAlbumRequest(artist.Id, album.Id,music.Id);
+        var request = new AddMusicToAlbumRequest(artist.Id, album.Id, music.Id);
 
         _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
 
@@ -167,9 +169,43 @@ public class MusicServiceTests
         //Assert
         Assert.Single(album.Musics);
         Assert.Equal(music.Id, album.Musics.First().Id);
-        Assert.Equal(music.Name,album.Musics.First().Name);
-        Assert.Equal(music.Duration,album.Musics.First().Duration);
+        Assert.Equal(music.Name, album.Musics.First().Name);
+        Assert.Equal(music.Duration, album.Musics.First().Duration);
 
         await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
+    }
+
+    [Fact]
+    public async Task AddMusicToAlbumAsync_Should_Throw_When_Add_Nonexistent_Music_To_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("Ride the Lightning");
+        var request = new AddMusicToAlbumRequest(artist.Id, album.Id, Guid.NewGuid());
+
+        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+
+        //Act
+        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.AddMusicToAlbumAsync(request));
+
+        //Assert
+        Assert.Contains("Music not found",exception.Message);
+    }
+
+    [Fact]
+    public async Task AddMusicToAlbumAsync_Should_Throw_When_Add_Music_To_Nonexistent_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
+        var request = new AddMusicToAlbumRequest(artist.Id,Guid.NewGuid(),music.Id);
+
+        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+
+        //Act
+        var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(() => _musicService.AddMusicToAlbumAsync(request));
+
+        //Assert
+        Assert.Contains("Album not found", exception.Message);
     }
 }

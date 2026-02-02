@@ -1,7 +1,9 @@
-﻿using MusicLibrary.Application.Abstractions.Services;
+﻿using MusicLibrary.Application.Abstractions.Repositories;
+using MusicLibrary.Application.Abstractions.Services;
+using MusicLibrary.Application.Exceptions;
 using MusicLibrary.Application.Requests.Music;
 using MusicLibrary.Application.Responses.DTOs;
-using MusicLibrary.Application.Abstractions.Repositories;
+using MusicLibrary.Domain.Exceptions;
 
 namespace MusicLibrary.Application.Services;
 
@@ -16,7 +18,7 @@ public class MusicService : IMusicService
 
     public async Task<MusicDto> CreateMusicAsync(CreateMusicRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
 
         var music = artist.AddMusic(request.Name, request.Duration);
 
@@ -27,25 +29,25 @@ public class MusicService : IMusicService
 
     public async Task<MusicDto?> GetMusicByIdAsync(GetMusicByIdRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
 
-        var music = artist.Musics.FirstOrDefault(m =>  m.Id == request.MusicId) ?? throw new InvalidOperationException("Music not found.");
+        var music = artist.Musics.FirstOrDefault(m => m.Id == request.MusicId) ?? throw new MusicNotFoundException();
 
         return new MusicDto(music.Id, music.Name, music.Duration);
     }
 
     public async Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(GetMusicsByArtistRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
 
         return artist.Musics.Select(m => new MusicDto(m.Id, m.Name, m.Duration)).ToList();
     }
 
     public async Task AddMusicToAlbumAsync(AddMusicToAlbumRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
-        var album = artist.Albums.FirstOrDefault(a => a.Id == request.AlbumId) ?? throw new InvalidOperationException("Album not found.");
-        var music = artist.Musics.FirstOrDefault(m => m.Id == request.MusicId) ?? throw new InvalidOperationException("Music not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var album = artist.Albums.FirstOrDefault(a => a.Id == request.AlbumId) ?? throw new AlbumNotFoundException();
+        var music = artist.Musics.FirstOrDefault(m => m.Id == request.MusicId) ?? throw new MusicNotFoundException();
 
         artist.AddMusicToAlbum(album.Id, music.Id);
 
@@ -54,7 +56,7 @@ public class MusicService : IMusicService
 
     public async Task DeleteMusicAsync(DeleteMusicRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
 
         artist.RemoveMusic(request.MusicId);
 

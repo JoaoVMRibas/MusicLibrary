@@ -1,4 +1,6 @@
-﻿namespace MusicLibrary.Domain.Entities;
+﻿using MusicLibrary.Domain.Exceptions;
+
+namespace MusicLibrary.Domain.Entities;
 
 public class Album
 {
@@ -20,7 +22,7 @@ public class Album
         ArgumentNullException.ThrowIfNull(music);
 
         if (_musics.Any(m => m.Id == music.Id))
-            throw new InvalidOperationException("Music already added to album.");
+            throw new MusicAlreadyInAlbumException();
 
         _musics.Add(music);
     }

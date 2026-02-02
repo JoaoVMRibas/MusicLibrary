@@ -1,4 +1,6 @@
-﻿namespace MusicLibrary.Domain.Entities;
+﻿using MusicLibrary.Domain.Exceptions;
+
+namespace MusicLibrary.Domain.Entities;
 
 public class Artist
 {
@@ -26,7 +28,7 @@ public class Artist
             throw new ArgumentException("The artist's name cannot be null or empty.", nameof(name));
 
         if (Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("The artist already has this name.");
+            throw new ArtistAlreadyHasThisNameException(name);
 
         Name = name; 
     }
@@ -34,7 +36,7 @@ public class Artist
     public Album AddAlbum(string name)
     {
         if (_albums.Any(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException("Album with the same name already exists.");
+            throw new DuplicateAlbumException(name);
 
         var album = new Album(name);
         _albums.Add(album);
@@ -43,7 +45,7 @@ public class Artist
 
     public void RemoveAlbum(Guid albumId)
     {
-        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
+        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
 
         _albums.Remove(album);
     }
@@ -51,7 +53,7 @@ public class Artist
     public Music AddMusic(string name, TimeSpan duration) 
     {
         if (_musics.Any(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException("Music with the same name already exists.");
+            throw new DuplicateMusicException(name);
 
         var music = new Music(name, duration);
         _musics.Add(music);
@@ -60,15 +62,15 @@ public class Artist
 
     public void RemoveMusic(Guid musicId)
     {
-        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new InvalidOperationException("Music not found.");
+        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
 
         _musics.Remove(music);
     }
 
     public void AddMusicToAlbum(Guid albumId, Guid musicId)
     {
-        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
-        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new InvalidOperationException("Music not found.");
+        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
+        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
 
         album.AddMusic(music);
     }

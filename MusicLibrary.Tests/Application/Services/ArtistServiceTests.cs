@@ -1,8 +1,10 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
+using MusicLibrary.Application.Exceptions;
 using MusicLibrary.Application.Requests.Artist;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
+using MusicLibrary.Domain.Exceptions;
 using NSubstitute;
 
 namespace MusicLibrary.Tests.Application.Services;
@@ -76,7 +78,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artistId).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.GetByIdAsync(new GetArtistByIdRequest(artistId)));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.GetByIdAsync(new GetArtistByIdRequest(artistId)));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);
@@ -153,7 +155,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artistId).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.UpdateAsync(request));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.UpdateAsync(request));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);
@@ -190,10 +192,10 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.UpdateAsync(request));
+        var exception = await Assert.ThrowsAsync<ArtistAlreadyHasThisNameException>(() => _artistService.UpdateAsync(request));
 
         //Assert
-        Assert.Contains("The artist already has this name.", exception.Message);
+        Assert.Contains($"The artist already has the name '{artist.Name}'.", exception.Message);
 
         await _artistRepository.DidNotReceive().UpdateAsync(Arg.Any<Artist>());
     }
@@ -221,7 +223,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.DeleteAsync(new DeleteArtistRequest(Guid.NewGuid())));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.DeleteAsync(new DeleteArtistRequest(Guid.NewGuid())));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);

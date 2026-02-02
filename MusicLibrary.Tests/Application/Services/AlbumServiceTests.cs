@@ -1,8 +1,10 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
+using MusicLibrary.Application.Exceptions;
 using MusicLibrary.Application.Requests.Album;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
+using MusicLibrary.Domain.Exceptions;
 using NSubstitute;
 
 namespace MusicLibrary.Tests.Application.Services;
@@ -48,7 +50,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act and Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
             () => _albumService.CreateAlbumAsync(new CreateAlbumRequest(artist.Id,"Ride the Lightning"))
         );
 
@@ -87,17 +89,18 @@ public class AlbumServiceTests
         //Arange
         var artist = new Artist("Metallica");
         artist.AddAlbum("Ride the Lightning");
+        var request = new CreateAlbumRequest(artist.Id, "Ride the Lightning");
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
 
         //Act and Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.CreateAlbumAsync(new CreateAlbumRequest(artist.Id,"Ride the Lightning"))
+        var exception = await Assert.ThrowsAsync<DuplicateAlbumException>(
+            () => _albumService.CreateAlbumAsync(request)
         );
 
         //Assert
-        Assert.Contains("Album with the same name already exists.", exception.Message);
+        Assert.Contains($"Album '{request.Name}' already exists.", exception.Message);
         Assert.Single(artist.Albums);
 
         await _artistRepository.DidNotReceive().UpdateAsync(Arg.Any<Artist>());
@@ -130,7 +133,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act and Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
             () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(Guid.NewGuid(), Guid.NewGuid()))
         );
 
@@ -146,7 +149,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act and Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(
             () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(artist.Id, Guid.NewGuid()))
         );
 
@@ -187,7 +190,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act and Assert
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
             () => _albumService.GetAlbumsByArtist(new GetAlbumsByArtistRequest(Guid.NewGuid()))
         );
 
@@ -222,7 +225,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
            () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(Guid.NewGuid(), Guid.NewGuid()))
         );
 
@@ -240,7 +243,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(
            () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(artist.Id, Guid.NewGuid()))
         );
 

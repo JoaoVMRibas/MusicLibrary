@@ -1,4 +1,5 @@
 ﻿using MusicLibrary.Domain.Entities;
+using MusicLibrary.Domain.Exceptions;
 
 namespace MusicLibrary.Tests.Domain.Entities;
 
@@ -70,10 +71,10 @@ public class ArtistTests
         var artist = new Artist(name);
 
         //Act and Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.UpdateName("Metallica"));
+        var exception = Assert.Throws<ArtistAlreadyHasThisNameException>(() => artist.UpdateName("Metallica"));
 
         //Assert
-        Assert.Contains("The artist already has this name.", exception.Message);
+        Assert.Contains($"The artist already has the name '{artist.Name}'.", exception.Message);
     }
 
     [Fact]
@@ -149,7 +150,7 @@ public class ArtistTests
         var artist = new Artist("Metallica");
 
         //Act and Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.RemoveMusic(Guid.NewGuid()));
+        var exception = Assert.Throws<MusicNotFoundException>(() => artist.RemoveMusic(Guid.NewGuid()));
 
         //Assert
         Assert.Empty(artist.Musics);
@@ -209,7 +210,7 @@ public class ArtistTests
         var album = artist.AddAlbum("Master of Puppets");
 
         //Act and Assert
-        var exception = Assert.Throws<InvalidOperationException>(()=> artist.RemoveAlbum(Guid.NewGuid()));
+        var exception = Assert.Throws<AlbumNotFoundException>(()=> artist.RemoveAlbum(Guid.NewGuid()));
 
         //Assert
         Assert.Single(artist.Albums);
@@ -242,7 +243,7 @@ public class ArtistTests
         var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
 
         //Act
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(album.Id, Guid.NewGuid()));
+        var exception = Assert.Throws<MusicNotFoundException>(() => artist.AddMusicToAlbum(album.Id, Guid.NewGuid()));
 
         //Assert
         Assert.Empty(album.Musics);
@@ -258,7 +259,7 @@ public class ArtistTests
         var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
 
         //Act
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(Guid.NewGuid(), music.Id));
+        var exception = Assert.Throws<AlbumNotFoundException>(() => artist.AddMusicToAlbum(Guid.NewGuid(), music.Id));
 
         //Assert
         Assert.Contains("Album not found.", exception.Message);
@@ -274,7 +275,7 @@ public class ArtistTests
 
         //Act
         artist.AddMusicToAlbum(album.Id, music.Id);
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusicToAlbum(album.Id, music.Id));
+        var exception = Assert.Throws<MusicAlreadyInAlbumException>(() => artist.AddMusicToAlbum(album.Id, music.Id));
 
         //Assert
         Assert.Single(album.Musics);
@@ -306,11 +307,11 @@ public class ArtistTests
         var album = artist.AddAlbum("The Black Album");
 
         //Act
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddAlbum("The Black Album"));
+        var exception = Assert.Throws<DuplicateAlbumException>(() => artist.AddAlbum("The Black Album"));
 
         //Assert
         Assert.Single(artist.Albums);
-        Assert.Contains("Album with the same name already exists.", exception.Message);
+        Assert.Contains($"Album '{album.Name}' already exists.", exception.Message);
     }
 
     [Fact]
@@ -322,10 +323,10 @@ public class ArtistTests
         var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
 
         //Act
-        var exception = Assert.Throws<InvalidOperationException>(() => artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331)));
+        var exception = Assert.Throws<DuplicateMusicException>(() => artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331)));
 
         //Assert
         Assert.Single(artist.Musics);
-        Assert.Contains("Music with the same name already exists.", exception.Message);
+        Assert.Contains($"Music '{music.Name}' already exists.", exception.Message);
     }
 }

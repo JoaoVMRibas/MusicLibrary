@@ -1,5 +1,6 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
+using MusicLibrary.Application.Exceptions;
 using MusicLibrary.Application.Requests.Artist;
 using MusicLibrary.Application.Responses.DTOs;
 using MusicLibrary.Domain.Entities;
@@ -34,7 +35,7 @@ public class ArtistService : IArtistService
     {
         var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
 
-        if(artist == null) throw new InvalidOperationException("Artist not found.");
+        if (artist == null) throw new ArtistNotFoundException();
 
         return new ArtistDto(artist.Id,artist.Name);
     }
@@ -43,7 +44,7 @@ public class ArtistService : IArtistService
     {
         var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
 
-        if (artist == null) throw new InvalidOperationException("Artist not found.");
+        if (artist == null) throw new ArtistNotFoundException();
 
         artist.UpdateName(request.Name);
 
@@ -56,7 +57,7 @@ public class ArtistService : IArtistService
     {
         var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
 
-        if( artist == null) throw new InvalidOperationException("Artist not found.");
+        if (artist == null) throw new ArtistNotFoundException();
 
         await _artistRepository.DeleteAsync(artist);
     }
