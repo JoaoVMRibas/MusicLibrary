@@ -23,12 +23,12 @@ public class AlbumServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var request = new CreateAlbumRequest("Ride the Lightning");
+        var request = new CreateAlbumRequest(artist.Id,"Ride the Lightning");
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albumDto = await _albumService.CreateAlbumAsync(artist.Id, request);
+        var albumDto = await _albumService.CreateAlbumAsync(request);
 
         //Assert
         Assert.Single(artist.Albums);
@@ -49,7 +49,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.CreateAlbumAsync(artist.Id, new CreateAlbumRequest("Ride the Lightning"))
+            () => _albumService.CreateAlbumAsync(new CreateAlbumRequest(artist.Id,"Ride the Lightning"))
         );
 
         //Assert
@@ -70,7 +70,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<ArgumentException>(
-            () => _albumService.CreateAlbumAsync(artist.Id, new CreateAlbumRequest(string.Empty))
+            () => _albumService.CreateAlbumAsync(new CreateAlbumRequest(artist.Id, string.Empty))
         );
 
         //Assert
@@ -93,7 +93,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.CreateAlbumAsync(artist.Id, new CreateAlbumRequest("Ride the Lightning"))
+            () => _albumService.CreateAlbumAsync(new CreateAlbumRequest(artist.Id,"Ride the Lightning"))
         );
 
         //Assert
@@ -203,7 +203,7 @@ public class AlbumServiceTests
         //Act and Assert
         Assert.Equal(2, artist.Albums.Count);
 
-        await _albumService.DeleteAlbumAsync(artist.Id, album.Id);
+        await _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(artist.Id, album.Id));
 
         Assert.Single(artist.Albums);
         Assert.Equal("Master of Puppets", artist.Albums.First().Name);
@@ -219,7 +219,7 @@ public class AlbumServiceTests
 
         //Act
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-           () => _albumService.DeleteAlbumAsync(Guid.NewGuid(), Guid.NewGuid())
+           () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(Guid.NewGuid(), Guid.NewGuid()))
         );
 
         //Assert
@@ -237,7 +237,7 @@ public class AlbumServiceTests
 
         //Act
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-           () => _albumService.DeleteAlbumAsync(artist.Id, Guid.NewGuid())
+           () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(artist.Id, Guid.NewGuid()))
         );
 
         //Assert

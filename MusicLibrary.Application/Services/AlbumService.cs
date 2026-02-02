@@ -14,9 +14,9 @@ public class AlbumService : IAlbumService
         _artistRepository = artistRepository;
     }
 
-    public async Task<AlbumDto> CreateAlbumAsync(Guid artistId, CreateAlbumRequest request)
+    public async Task<AlbumDto> CreateAlbumAsync(CreateAlbumRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
 
         var album = artist.AddAlbum(request.Name);
 
@@ -41,11 +41,11 @@ public class AlbumService : IAlbumService
         return artist.Albums.Select(a => new AlbumDto(a.Id,a.Name,a.Duration)).ToList();
     }
 
-    public async Task DeleteAlbumAsync(Guid artistId, Guid albumId)
+    public async Task DeleteAlbumAsync(DeleteAlbumRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
 
-        artist.RemoveAlbum(albumId);
+        artist.RemoveAlbum(request.AlbumId);
 
         await _artistRepository.UpdateAsync(artist);
     }

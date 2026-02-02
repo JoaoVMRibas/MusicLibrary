@@ -188,7 +188,6 @@ public class ArtistTests
         Assert.Contains("Album not found.", exception.Message);
     }
 
-
     [Fact]
     public void Should_Add_Music_To_Album()
     {
