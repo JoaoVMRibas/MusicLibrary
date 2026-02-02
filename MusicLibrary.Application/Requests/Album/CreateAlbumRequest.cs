@@ -1,4 +1,4 @@
-﻿namespace MusicLibrary.Application.Requests;
+﻿namespace MusicLibrary.Application.Requests.Album;
 
 public sealed record CreateAlbumRequest
 (

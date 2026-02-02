@@ -1,6 +1,6 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
-using MusicLibrary.Application.Requests;
+using MusicLibrary.Application.Requests.Album;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
 using NSubstitute;
@@ -112,7 +112,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albumDto = await _albumService.GetAlbumByIdAsync(artist.Id, album.Id);
+        var albumDto = await _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(artist.Id, album.Id));
 
         //Assert
         Assert.NotNull(albumDto);
@@ -129,7 +129,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.GetAlbumByIdAsync(Guid.NewGuid(), Guid.NewGuid())
+            () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(Guid.NewGuid(), Guid.NewGuid()))
         );
 
         //Assert
@@ -145,7 +145,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.GetAlbumByIdAsync(artist.Id, Guid.NewGuid())
+            () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(artist.Id, Guid.NewGuid()))
         );
 
         //Assert
@@ -162,7 +162,7 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albums = await _albumService.GetAlbumsByArtist(artist.Id);
+        var albums = await _albumService.GetAlbumsByArtist(new GetAlbumsByArtistRequest(artist.Id));
 
         //Assert
         Assert.NotNull(albums);
@@ -184,7 +184,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _albumService.GetAlbumsByArtist(Guid.NewGuid())
+            () => _albumService.GetAlbumsByArtist(new GetAlbumsByArtistRequest(Guid.NewGuid()))
         );
 
         //Assert

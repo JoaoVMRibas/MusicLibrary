@@ -1,5 +1,5 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
-using MusicLibrary.Application.Requests;
+using MusicLibrary.Application.Requests.Artist;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
 using NSubstitute;
@@ -55,7 +55,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _artistService.GetByIdAsync(artist.Id);
+        var response = await _artistService.GetByIdAsync(new GetArtistByIdRequest(artist.Id));
 
         //Assert
         Assert.NotNull(response);
@@ -74,7 +74,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artistId).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.GetByIdAsync(artistId));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.GetByIdAsync(new GetArtistByIdRequest(artistId)));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);
@@ -205,7 +205,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        await _artistService.DeleteAsync(artist.Id);
+        await _artistService.DeleteAsync(new DeleteArtistRequest(artist.Id));
 
         //Assert
         await _artistRepository.Received(1).DeleteAsync(artist);
@@ -218,7 +218,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.DeleteAsync(Guid.NewGuid()));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _artistService.DeleteAsync(new DeleteArtistRequest(Guid.NewGuid())));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);

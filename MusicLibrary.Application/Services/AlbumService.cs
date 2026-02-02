@@ -1,6 +1,6 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
-using MusicLibrary.Application.Requests;
+using MusicLibrary.Application.Requests.Album;
 using MusicLibrary.Application.Responses.DTOs;
 
 namespace MusicLibrary.Application.Services;
@@ -25,18 +25,18 @@ public class AlbumService : IAlbumService
         return new AlbumDto(album.Id, album.Name,album.Duration);
     }
 
-    public async Task<AlbumDto?> GetAlbumByIdAsync(Guid artistId, Guid albumId)
+    public async Task<AlbumDto?> GetAlbumByIdAsync(GetAlbumByIdRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
         
-        var album = artist.Albums.FirstOrDefault(a =>  a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
+        var album = artist.Albums.FirstOrDefault(a =>  a.Id == request.AlbumId) ?? throw new InvalidOperationException("Album not found.");
 
         return new AlbumDto(album.Id,album.Name,album.Duration);
     }
 
-    public async Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(Guid artistId)
+    public async Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(GetAlbumsByArtistRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new InvalidOperationException("Artist not found.");
+        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
 
         return artist.Albums.Select(a => new AlbumDto(a.Id,a.Name,a.Duration)).ToList();
     }
