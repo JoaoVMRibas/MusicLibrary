@@ -44,7 +44,7 @@ public class MusicService : IMusicService
     public async Task AddMusicToAlbumAsync(AddMusicToAlbumRequest request)
     {
         var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new InvalidOperationException("Artist not found.");
-        var album = artist.Musics.FirstOrDefault(a => a.Id == request.AlbumId) ?? throw new InvalidOperationException("Album not found.");
+        var album = artist.Albums.FirstOrDefault(a => a.Id == request.AlbumId) ?? throw new InvalidOperationException("Album not found.");
         var music = artist.Musics.FirstOrDefault(m => m.Id == request.MusicId) ?? throw new InvalidOperationException("Music not found.");
 
         artist.AddMusicToAlbum(album.Id, music.Id);
