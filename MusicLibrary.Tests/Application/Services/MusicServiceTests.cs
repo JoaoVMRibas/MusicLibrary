@@ -174,38 +174,4 @@ public class MusicServiceTests
 
         await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
     }
-
-    [Fact]
-    public async Task AddMusicToAlbumAsync_Should_Throw_When_Add_Nonexistent_Music_To_Album()
-    {
-        //Arrange
-        var artist = new Artist("Metallica");
-        var album = artist.AddAlbum("Ride the Lightning");
-        var request = new AddMusicToAlbumRequest(artist.Id, album.Id, Guid.NewGuid());
-
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
-
-        //Act
-        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.AddMusicToAlbumAsync(request));
-
-        //Assert
-        Assert.Contains("Music not found",exception.Message);
-    }
-
-    [Fact]
-    public async Task AddMusicToAlbumAsync_Should_Throw_When_Add_Music_To_Nonexistent_Album()
-    {
-        //Arrange
-        var artist = new Artist("Metallica");
-        var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new AddMusicToAlbumRequest(artist.Id,Guid.NewGuid(),music.Id);
-
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
-
-        //Act
-        var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(() => _musicService.AddMusicToAlbumAsync(request));
-
-        //Assert
-        Assert.Contains("Album not found", exception.Message);
-    }
 }
