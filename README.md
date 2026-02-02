@@ -35,21 +35,61 @@ The **Domain Layer** represents the core of the system and contains all business
 
 ---
 
+## Application Layer
+
+The **Application Layer** contains the use cases of the system and orchestrates interactions between the domain and external layers.
+
+### Implemented Services
+
+- **ArtistService**
+  - Create
+  - Get by id
+  - Get all
+  - Update
+  - Delete
+
+- **AlbumService**
+  - Create album
+  - Get album by id
+  - Get albums by artist
+  - Delete album
+
+- **MusicService**
+  - Create music
+  - Get music by id
+  - Get musics by artist
+  - Add music to album
+  - Delete music
+
+### Requests & DTOs
+
+- Each use case has its own **Request object**
+- Requests are grouped by entity (Artist, Album, Music)
+- Output is returned via **DTOs**
+
+---
+
 ## Tests
 
 Unit tests were implemented to validate:
 
+### Domain Tests
 - Entity creation rules
-- Business rules
+- Business invariants
 - Aggregate behavior
-- Error scenarios (invalid input, duplicates, invalid relationships)
+- Error scenarios (duplicates, invalid input, invalid relationships)
+
+### Application Tests
+- Service behavior
+- Repository interaction
+- Exception propagation
 
 ---
 
 ## Next Steps
 
-- Implement the **Application Layer**
-- Define use cases and application services
-- Add repository abstractions
-- Implement the **Infrastructure Layer** using Entity Framework Core
+- Implement the **Infrastructure Layer**
+  - Entity Framework Core
+  - Repository implementations
+- Create database migrations
 - Expose functionality through a **Web API**
