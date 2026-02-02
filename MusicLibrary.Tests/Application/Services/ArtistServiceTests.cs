@@ -1,4 +1,5 @@
 ﻿using MusicLibrary.Application.Abstractions.Repositories;
+using MusicLibrary.Application.Abstractions.Services;
 using MusicLibrary.Application.Requests.Artist;
 using MusicLibrary.Application.Services;
 using MusicLibrary.Domain.Entities;
@@ -9,7 +10,7 @@ namespace MusicLibrary.Tests.Application.Services;
 public class ArtistServiceTests
 {
     private readonly IArtistRepository _artistRepository;
-    private readonly ArtistService _artistService;
+    private readonly IArtistService _artistService;
 
     public ArtistServiceTests()
     {
@@ -51,11 +52,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
+        var request = new GetArtistByIdRequest(artist.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _artistService.GetByIdAsync(new GetArtistByIdRequest(artist.Id));
+        var response = await _artistService.GetByIdAsync(request);
 
         //Assert
         Assert.NotNull(response);
@@ -201,11 +203,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
+        var request = new DeleteArtistRequest(artist.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        await _artistService.DeleteAsync(new DeleteArtistRequest(artist.Id));
+        await _artistService.DeleteAsync(request);
 
         //Assert
         await _artistRepository.Received(1).DeleteAsync(artist);

@@ -28,13 +28,13 @@ public class AlbumServiceTests
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albumDto = await _albumService.CreateAlbumAsync(request);
+        var response = await _albumService.CreateAlbumAsync(request);
 
         //Assert
         Assert.Single(artist.Albums);
-        Assert.NotEqual(Guid.Empty, albumDto.Id);
-        Assert.Equal("Ride the Lightning", albumDto.Name);
-        Assert.Equal(TimeSpan.Zero, albumDto.Duration);
+        Assert.NotEqual(Guid.Empty, response.Id);
+        Assert.Equal("Ride the Lightning", response.Name);
+        Assert.Equal(TimeSpan.Zero, response.Duration);
 
         await _artistRepository.Received(1).UpdateAsync(artist);
     }
@@ -109,16 +109,18 @@ public class AlbumServiceTests
         //Arrange
         var artist = new Artist("Metallica");
         var album = artist.AddAlbum("Ride the Lightning");
+        var request = new GetAlbumByIdRequest(artist.Id, album.Id);
+
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albumDto = await _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(artist.Id, album.Id));
+        var response = await _albumService.GetAlbumByIdAsync(request);
 
         //Assert
-        Assert.NotNull(albumDto);
-        Assert.Equal(album.Id, albumDto.Id);
-        Assert.Equal(album.Name, albumDto.Name);
-        Assert.Equal(album.Duration, albumDto.Duration);
+        Assert.NotNull(response);
+        Assert.Equal(album.Id, response.Id);
+        Assert.Equal(album.Name, response.Name);
+        Assert.Equal(album.Duration, response.Duration);
     }
 
     [Fact]
@@ -159,16 +161,18 @@ public class AlbumServiceTests
         var artist = new Artist("Metallica");
         artist.AddAlbum("Ride the Lightning");
         artist.AddAlbum("Master of Puppets");
+        var request = new GetAlbumsByArtistRequest(artist.Id);
+
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var albums = await _albumService.GetAlbumsByArtist(new GetAlbumsByArtistRequest(artist.Id));
+        var response = await _albumService.GetAlbumsByArtist(request);
 
         //Assert
-        Assert.NotNull(albums);
-        Assert.Equal(2, albums.Count);
+        Assert.NotNull(response);
+        Assert.Equal(2, response.Count);
 
-        Assert.Collection(albums,
+        Assert.Collection(response,
             album => Assert.Equal("Ride the Lightning", album.Name),
             album => Assert.Equal("Master of Puppets", album.Name)
         );
