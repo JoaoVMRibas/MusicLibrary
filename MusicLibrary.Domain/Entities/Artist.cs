@@ -58,6 +58,13 @@ public class Artist
         return music;
     }
 
+    public void RemoveMusic(Guid musicId)
+    {
+        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new InvalidOperationException("Music not found.");
+
+        _musics.Remove(music);
+    }
+
     public void AddMusicToAlbum(Guid albumId, Guid musicId)
     {
         var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new InvalidOperationException("Album not found.");
