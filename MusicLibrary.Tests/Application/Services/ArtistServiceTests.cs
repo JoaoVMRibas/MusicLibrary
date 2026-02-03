@@ -54,12 +54,11 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var request = new GetArtistByIdRequest(artist.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _artistService.GetByIdAsync(request);
+        var response = await _artistService.GetByIdAsync(artist.Id);
 
         //Assert
         Assert.NotNull(response);
@@ -78,7 +77,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(artistId).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.GetByIdAsync(new GetArtistByIdRequest(artistId)));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.GetByIdAsync(artistId));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);
@@ -131,12 +130,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Iron Maiden");
-        var request = new UpdateArtistRequest(artist.Id, "Guns");
+        var request = new UpdateArtistRequest("Guns");
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _artistService.UpdateAsync(request);
+        var response = await _artistService.UpdateAsync(artist.Id,request);
 
         //Assert
         Assert.Equal(artist.Id, response.Id);
@@ -150,12 +149,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artistId = Guid.NewGuid();
-        var request = new UpdateArtistRequest(artistId, "Guns");
+        var request = new UpdateArtistRequest("Guns");
 
         _artistRepository.GetByIdAsync(artistId).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.UpdateAsync(request));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.UpdateAsync(artistId,request));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);
@@ -168,12 +167,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var request = new UpdateArtistRequest(artist.Id, string.Empty);
+        var request = new UpdateArtistRequest(string.Empty);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<ArgumentException>(() => _artistService.UpdateAsync(request));
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => _artistService.UpdateAsync(artist.Id,request));
 
         //Assert
         Assert.Equal("name", exception.ParamName);
@@ -187,12 +186,12 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var request = new UpdateArtistRequest(artist.Id, "Metallica");
+        var request = new UpdateArtistRequest("Metallica");
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<ArtistAlreadyHasThisNameException>(() => _artistService.UpdateAsync(request));
+        var exception = await Assert.ThrowsAsync<ArtistAlreadyHasThisNameException>(() => _artistService.UpdateAsync(artist.Id,request));
 
         //Assert
         Assert.Contains($"The artist already has the name '{artist.Name}'.", exception.Message);
@@ -205,12 +204,11 @@ public class ArtistServiceTests
     {
         //Arrange
         var artist = new Artist("Metallica");
-        var request = new DeleteArtistRequest(artist.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        await _artistService.DeleteAsync(request);
+        await _artistService.DeleteAsync(artist.Id);
 
         //Assert
         await _artistRepository.Received(1).DeleteAsync(artist);
@@ -223,7 +221,7 @@ public class ArtistServiceTests
         _artistRepository.GetByIdAsync(Arg.Any<Guid>()).Returns((Artist?)null);
 
         //Act
-        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.DeleteAsync(new DeleteArtistRequest(Guid.NewGuid())));
+        var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(() => _artistService.DeleteAsync(Guid.NewGuid()));
 
         //Assert
         Assert.Contains("Artist not found.", exception.Message);

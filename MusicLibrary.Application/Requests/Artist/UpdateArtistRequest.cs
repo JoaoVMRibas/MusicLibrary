@@ -1,7 +1,3 @@
 ﻿namespace MusicLibrary.Application.Requests.Artist;
 
-public sealed record UpdateArtistRequest
-(
-    Guid ArtistId, 
-    string Name
-);
+public sealed record UpdateArtistRequest(string Name);

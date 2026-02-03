@@ -31,18 +31,18 @@ public class ArtistService : IArtistService
         return artistList.Select(artist => new ArtistDto(artist.Id,artist.Name)).ToList();
     }
 
-    public async Task<ArtistDto?> GetByIdAsync(GetArtistByIdRequest request)
+    public async Task<ArtistDto?> GetByIdAsync(Guid id)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
+        var artist = await _artistRepository.GetByIdAsync(id);
 
         if (artist == null) throw new ArtistNotFoundException();
 
         return new ArtistDto(artist.Id,artist.Name);
     }
 
-    public async Task<ArtistDto> UpdateAsync(UpdateArtistRequest request)
+    public async Task<ArtistDto> UpdateAsync(Guid id,UpdateArtistRequest request)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
+        var artist = await _artistRepository.GetByIdAsync(id);
 
         if (artist == null) throw new ArtistNotFoundException();
 
@@ -53,9 +53,9 @@ public class ArtistService : IArtistService
         return new ArtistDto(artist.Id, artist.Name);
     }
 
-    public async Task DeleteAsync(DeleteArtistRequest request)
+    public async Task DeleteAsync(Guid id)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId);
+        var artist = await _artistRepository.GetByIdAsync(id);
 
         if (artist == null) throw new ArtistNotFoundException();
 
