@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MusicLibrary.Domain.Entities;
 
-namespace MusicLibrary.Infrastructure.Persistence.Configurations;
+namespace MusicLibrary.Infrastructure.Data.Configurations;
 
 public class ArtistConfiguration : IEntityTypeConfiguration<Artist>
 {
@@ -12,23 +12,27 @@ public class ArtistConfiguration : IEntityTypeConfiguration<Artist>
 
         builder.HasKey(a => a.Id);
 
+        builder.Property(a => a.Id)
+               .ValueGeneratedNever();
+
         builder.Property(a => a.Name)
                .IsRequired()
                .HasMaxLength(200);
 
-        builder.HasMany<Album>(a => a.Albums)
+        builder.HasMany(a => a.Albums)
                .WithOne()
-               .HasForeignKey("ArtistId")
+               .HasForeignKey(al => al.ArtistId) 
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<Music>(a => a.Musics)
-               .WithOne()
-               .HasForeignKey("ArtistId")
-               .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(a => a.Albums)
                .UsePropertyAccessMode(PropertyAccessMode.Field)
                .Metadata.SetField("_albums");
+
+        builder.HasMany(a => a.Musics)
+               .WithOne()
+               .HasForeignKey(m => m.ArtistId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.Navigation(a => a.Musics)
                .UsePropertyAccessMode(PropertyAccessMode.Field)

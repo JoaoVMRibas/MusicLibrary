@@ -5,18 +5,23 @@ namespace MusicLibrary.Domain.Entities;
 public class Album
 {
     public Guid Id { get; private set; }
+    public Guid ArtistId { get; private set; }
     public string Name { get; private set; }
+    public TimeSpan Duration => _albumMusics.Aggregate(TimeSpan.Zero, (total, music) => total + music.Duration);
+
     private readonly List<Music> _albumMusics = [];
     public IReadOnlyCollection<Music> Musics => _albumMusics;
-    public TimeSpan Duration => _albumMusics.Aggregate(TimeSpan.Zero, (total, music) => total + music.Duration);
-    internal Album(string name)
+
+    internal Album(Guid artistId,string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The album name cannot be null or empty.", nameof(name));
 
         Id = Guid.NewGuid();
         Name = name;
+        ArtistId = artistId;
     }
+    
     internal void AddMusic(Music music)
     {
         ArgumentNullException.ThrowIfNull(music);

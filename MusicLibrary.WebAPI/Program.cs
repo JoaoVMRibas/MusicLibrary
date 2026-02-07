@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Application.Abstractions.Services;
 using MusicLibrary.Application.Services;
-using MusicLibrary.Infrastructure.Persistence;
+using MusicLibrary.Infrastructure.Data;
 using MusicLibrary.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +15,7 @@ builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
 
 builder.Services.AddScoped<IArtistService, ArtistService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
-builder.Services.AddScoped<IMusicService, MusicService>();
+//builder.Services.AddScoped<IMusicService, MusicService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

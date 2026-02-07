@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MusicLibrary.Application.Abstractions.Repositories;
 using MusicLibrary.Domain.Entities;
-using MusicLibrary.Infrastructure.Persistence;
+using MusicLibrary.Infrastructure.Data;
 
 namespace MusicLibrary.Infrastructure.Repositories;
 
@@ -11,11 +15,6 @@ public class ArtistRepository : IArtistRepository
     public ArtistRepository(MusicLibraryDbContext context)
     {
         _context = context;
-    }
-    public async Task AddAsync(Artist artist)
-    {
-        await _context.Artists.AddAsync(artist);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<Artist?> GetByIdAsync(Guid id)
@@ -30,14 +29,18 @@ public class ArtistRepository : IArtistRepository
     public async Task<IReadOnlyCollection<Artist>> GetAllAsync()
     {
         return await _context.Artists
-                        .Include(a => a.Albums)
-                        .Include(a => a.Musics)
+                        .AsNoTracking()
                         .ToListAsync();
+    }
+
+    public async Task AddAsync(Artist artist)
+    {
+        await _context.Artists.AddAsync(artist);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Artist artist)
     {
-        _context.Artists.Update(artist);
         await _context.SaveChangesAsync();
     }
 

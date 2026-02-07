@@ -6,7 +6,7 @@ namespace MusicLibrary.Application.Abstractions.Services;
 public interface IAlbumService
 {
     Task<AlbumDto> CreateAlbumAsync(CreateAlbumRequest request);
-    Task<AlbumDto?> GetAlbumByIdAsync(GetAlbumByIdRequest request);
-    Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(GetAlbumsByArtistRequest request);
-    Task DeleteAlbumAsync(DeleteAlbumRequest request);
+    Task<AlbumDto?> GetAlbumByIdAsync(Guid artistId, Guid albumId);
+    Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(Guid artistId);
+    Task DeleteAlbumAsync(Guid artistId, Guid albumId);
 }

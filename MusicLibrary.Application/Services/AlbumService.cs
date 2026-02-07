@@ -27,27 +27,27 @@ public class AlbumService : IAlbumService
         return new AlbumDto(album.Id, album.Name,album.Duration);
     }
 
-    public async Task<AlbumDto?> GetAlbumByIdAsync(GetAlbumByIdRequest request)
+    public async Task<AlbumDto?> GetAlbumByIdAsync(Guid artistId, Guid albumId)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
-        var album = artist.Albums.FirstOrDefault(a => a.Id == request.AlbumId) ?? throw new AlbumNotFoundException();
+        var album = artist.Albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
 
         return new AlbumDto(album.Id,album.Name,album.Duration);
     }
 
-    public async Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(GetAlbumsByArtistRequest request)
+    public async Task<IReadOnlyCollection<AlbumDto>> GetAlbumsByArtist(Guid artistId)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
         return artist.Albums.Select(a => new AlbumDto(a.Id,a.Name,a.Duration)).ToList();
     }
 
-    public async Task DeleteAlbumAsync(DeleteAlbumRequest request)
+    public async Task DeleteAlbumAsync(Guid artistId, Guid albumId)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
-        artist.RemoveAlbum(request.AlbumId);
+        artist.RemoveAlbum(albumId);
 
         await _artistRepository.UpdateAsync(artist);
     }

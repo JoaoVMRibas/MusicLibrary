@@ -12,6 +12,12 @@ public class MusicConfiguration : IEntityTypeConfiguration<Music>
 
         builder.HasKey(m => m.Id);
 
+        builder.Property(m => m.Id)
+               .ValueGeneratedNever();
+
+        builder.Property(m => m.ArtistId)
+            .IsRequired();
+
         builder.Property(m => m.Name)
             .IsRequired()
             .HasMaxLength(200);

@@ -38,7 +38,7 @@ public class Artist
         if (_albums.Any(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             throw new DuplicateAlbumException(name);
 
-        var album = new Album(name);
+        var album = new Album(this.Id, name);
         _albums.Add(album);
         return album;
     }
@@ -55,7 +55,7 @@ public class Artist
         if (_musics.Any(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             throw new DuplicateMusicException(name);
 
-        var music = new Music(name, duration);
+        var music = new Music(this.Id,name, duration);
         _musics.Add(music);
         return music;
     }

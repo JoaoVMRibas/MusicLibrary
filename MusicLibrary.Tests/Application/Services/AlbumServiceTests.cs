@@ -112,12 +112,11 @@ public class AlbumServiceTests
         //Arrange
         var artist = new Artist("Metallica");
         var album = artist.AddAlbum("Ride the Lightning");
-        var request = new GetAlbumByIdRequest(artist.Id, album.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _albumService.GetAlbumByIdAsync(request);
+        var response = await _albumService.GetAlbumByIdAsync(artist.Id, album.Id);
 
         //Assert
         Assert.NotNull(response);
@@ -134,7 +133,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
-            () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(Guid.NewGuid(), Guid.NewGuid()))
+            () => _albumService.GetAlbumByIdAsync(Guid.NewGuid(), Guid.NewGuid())
         );
 
         //Assert
@@ -150,7 +149,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(
-            () => _albumService.GetAlbumByIdAsync(new GetAlbumByIdRequest(artist.Id, Guid.NewGuid()))
+            () => _albumService.GetAlbumByIdAsync(artist.Id, Guid.NewGuid())
         );
 
         //Assert
@@ -164,12 +163,11 @@ public class AlbumServiceTests
         var artist = new Artist("Metallica");
         artist.AddAlbum("Ride the Lightning");
         artist.AddAlbum("Master of Puppets");
-        var request = new GetAlbumsByArtistRequest(artist.Id);
 
         _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _albumService.GetAlbumsByArtist(request);
+        var response = await _albumService.GetAlbumsByArtist(artist.Id);
 
         //Assert
         Assert.NotNull(response);
@@ -191,7 +189,7 @@ public class AlbumServiceTests
 
         //Act and Assert
         var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
-            () => _albumService.GetAlbumsByArtist(new GetAlbumsByArtistRequest(Guid.NewGuid()))
+            () => _albumService.GetAlbumsByArtist(Guid.NewGuid())
         );
 
         //Assert
@@ -210,7 +208,7 @@ public class AlbumServiceTests
         //Act and Assert
         Assert.Equal(2, artist.Albums.Count);
 
-        await _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(artist.Id, album.Id));
+        await _albumService.DeleteAlbumAsync(artist.Id, album.Id);
 
         Assert.Single(artist.Albums);
         Assert.Equal("Master of Puppets", artist.Albums.First().Name);
@@ -226,7 +224,7 @@ public class AlbumServiceTests
 
         //Act
         var exception = await Assert.ThrowsAsync<ArtistNotFoundException>(
-           () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(Guid.NewGuid(), Guid.NewGuid()))
+           () => _albumService.DeleteAlbumAsync(Guid.NewGuid(), Guid.NewGuid())
         );
 
         //Assert
@@ -244,7 +242,7 @@ public class AlbumServiceTests
 
         //Act
         var exception = await Assert.ThrowsAsync<AlbumNotFoundException>(
-           () => _albumService.DeleteAlbumAsync(new DeleteAlbumRequest(artist.Id, Guid.NewGuid()))
+           () => _albumService.DeleteAlbumAsync(artist.Id, Guid.NewGuid())
         );
 
         //Assert

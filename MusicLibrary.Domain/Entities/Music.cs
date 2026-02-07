@@ -3,10 +3,11 @@
 public class Music
 {
     public Guid Id { get; private set; }
+    public Guid ArtistId { get; private set; }
     public string Name { get; private set; }
     public TimeSpan Duration { get; private set; }
 
-    internal Music(string name, TimeSpan duration)
+    internal Music(Guid artistId, string name, TimeSpan duration)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("The music name cannot be null or empty.", nameof(name));
@@ -17,5 +18,6 @@ public class Music
         Id = Guid.NewGuid();
         Name = name;
         Duration = duration;
+        ArtistId = artistId;
     }
 }
