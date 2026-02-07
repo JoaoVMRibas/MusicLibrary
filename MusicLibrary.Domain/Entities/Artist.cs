@@ -43,9 +43,14 @@ public class Artist
         return album;
     }
 
+    private Album GetAlbumById(Guid albumId)
+    {
+        return _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
+    }   
+
     public void RemoveAlbum(Guid albumId)
     {
-        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
+        var album = GetAlbumById(albumId);
 
         _albums.Remove(album);
     }
@@ -60,17 +65,22 @@ public class Artist
         return music;
     }
 
+    private Music GetMusicById(Guid musicId)
+    {
+        return _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
+    }
+
     public void RemoveMusic(Guid musicId)
     {
-        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
+        var music = GetMusicById(musicId);
 
         _musics.Remove(music);
     }
 
     public void AddMusicToAlbum(Guid albumId, Guid musicId)
     {
-        var album = _albums.FirstOrDefault(a => a.Id == albumId) ?? throw new AlbumNotFoundException();
-        var music = _musics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
+        var album = GetAlbumById(albumId);
+        var music = GetMusicById(musicId);
 
         album.AddMusic(music);
     }
