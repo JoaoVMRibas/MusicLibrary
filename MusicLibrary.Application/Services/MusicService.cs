@@ -52,6 +52,15 @@ public class MusicService : IMusicService
         await _artistRepository.UpdateAsync(artist);
     }
 
+    public async Task RemoveMusicFromAlbumAsync(Guid artistId, Guid albumId, Guid musicId)
+    {
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
+
+        artist.RemoveMusicFromAlbum(albumId, musicId);
+
+        await _artistRepository.UpdateAsync(artist);
+    }
+
     public async Task DeleteMusicAsync(Guid artistId, Guid musicId)
     {
         var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();

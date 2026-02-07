@@ -84,4 +84,11 @@ public class Artist
 
         album.AddMusic(music);
     }
+
+    public void RemoveMusicFromAlbum(Guid albumId, Guid musicId)
+    {
+        var album = GetAlbumById(albumId);
+
+        album.RemoveMusic(musicId);
+    }
 }

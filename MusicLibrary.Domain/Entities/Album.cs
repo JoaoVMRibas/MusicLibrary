@@ -31,4 +31,16 @@ public class Album
 
         _albumMusics.Add(music);
     }
+
+    internal Music GetMusicById(Guid musicId)
+    {
+        var music = _albumMusics.FirstOrDefault(m => m.Id == musicId) ?? throw new MusicNotFoundException();
+        return music;
+    }
+
+    internal void RemoveMusic(Guid musicId)
+    {
+        var music = GetMusicById(musicId);
+        _albumMusics.Remove(music);
+    }
 }

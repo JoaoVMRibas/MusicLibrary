@@ -54,6 +54,13 @@ public class ArtistsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{artistId:guid}/albums/{albumId:guid}/musics/{musicId:guid}")]
+    public async Task<IActionResult> RemoveMusicFromAlbum(Guid artistId, Guid albumId, Guid musicId)
+    {
+        await _musicService.RemoveMusicFromAlbumAsync(artistId, albumId, musicId);
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id) 
     {

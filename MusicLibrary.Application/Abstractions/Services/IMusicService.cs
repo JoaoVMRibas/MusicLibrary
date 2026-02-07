@@ -9,5 +9,6 @@ public interface IMusicService
     Task<MusicDto?> GetMusicByIdAsync(Guid artistId,Guid id);
     Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(Guid artistId);
     Task AddMusicToAlbumAsync(Guid artistId, Guid albumId, Guid id);
+    Task RemoveMusicFromAlbumAsync(Guid artistId, Guid albumId, Guid id);
     Task DeleteMusicAsync(Guid artistId, Guid id);
 }
