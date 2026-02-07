@@ -15,7 +15,7 @@ builder.Services.AddScoped<IArtistRepository, ArtistRepository>();
 
 builder.Services.AddScoped<IArtistService, ArtistService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
-//builder.Services.AddScoped<IMusicService, MusicService>();
+builder.Services.AddScoped<IMusicService, MusicService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

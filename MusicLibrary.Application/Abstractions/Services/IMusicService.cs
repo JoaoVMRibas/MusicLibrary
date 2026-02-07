@@ -6,8 +6,8 @@ namespace MusicLibrary.Application.Abstractions.Services;
 public interface IMusicService
 {
     Task<MusicDto> CreateMusicAsync(CreateMusicRequest request);
-    Task<MusicDto?> GetMusicByIdAsync(GetMusicByIdRequest request);
-    Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(GetMusicsByArtistRequest request);
-    Task AddMusicToAlbumAsync(AddMusicToAlbumRequest request);
-    Task DeleteMusicAsync(DeleteMusicRequest request);
+    Task<MusicDto?> GetMusicByIdAsync(Guid artistId,Guid id);
+    Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(Guid artistId);
+    Task AddMusicToAlbumAsync(Guid artistId, Guid albumId, Guid id);
+    Task DeleteMusicAsync(Guid artistId, Guid id);
 }

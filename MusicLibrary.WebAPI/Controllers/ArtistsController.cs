@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MusicLibrary.Application.Abstractions.Services;
 using MusicLibrary.Application.Requests.Artist;
+using MusicLibrary.WebAPI.Models;
 
 namespace MusicLibrary.WebAPI.Controllers;
 
@@ -30,8 +31,9 @@ public class ArtistsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateArtistRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateArtistBody body)
     {
+        var request = new CreateArtistRequest(body.Name);
         var artist = await _artistService.CreateAsync(request);
         return CreatedAtAction(nameof(GetById), new { id = artist.Id }, artist);
     }

@@ -46,6 +46,5 @@ public class AlbumsController : ControllerBase
     {
         await _albumService.DeleteAlbumAsync(artistId, albumId);
         return NoContent();
-    }
-    
+    }   
 }

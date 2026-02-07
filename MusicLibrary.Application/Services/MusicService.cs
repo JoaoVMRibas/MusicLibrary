@@ -27,36 +27,36 @@ public class MusicService : IMusicService
         return new MusicDto(music.Id,music.Name,music.Duration);
     }
 
-    public async Task<MusicDto?> GetMusicByIdAsync(GetMusicByIdRequest request)
+    public async Task<MusicDto?> GetMusicByIdAsync(Guid artistId, Guid id)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
-        var music = artist.Musics.FirstOrDefault(m => m.Id == request.MusicId) ?? throw new MusicNotFoundException();
+        var music = artist.Musics.FirstOrDefault(m => m.Id == id) ?? throw new MusicNotFoundException();
 
         return new MusicDto(music.Id, music.Name, music.Duration);
     }
 
-    public async Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(GetMusicsByArtistRequest request)
+    public async Task<IReadOnlyCollection<MusicDto>> GetMusicsByArtistAsync(Guid artistId)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
         return artist.Musics.Select(m => new MusicDto(m.Id, m.Name, m.Duration)).ToList();
     }
 
-    public async Task AddMusicToAlbumAsync(AddMusicToAlbumRequest request)
+    public async Task AddMusicToAlbumAsync(Guid artistId,Guid albumId,Guid id)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
-        artist.AddMusicToAlbum(request.AlbumId, request.MusicId);
+        artist.AddMusicToAlbum(albumId, id);
 
         await _artistRepository.UpdateAsync(artist);
     }
 
-    public async Task DeleteMusicAsync(DeleteMusicRequest request)
+    public async Task DeleteMusicAsync(Guid artistId, Guid id)
     {
-        var artist = await _artistRepository.GetByIdAsync(request.ArtistId) ?? throw new ArtistNotFoundException();
+        var artist = await _artistRepository.GetByIdAsync(artistId) ?? throw new ArtistNotFoundException();
 
-        artist.RemoveMusic(request.MusicId);
+        artist.RemoveMusic(id);
 
         await _artistRepository.UpdateAsync(artist);
     }
