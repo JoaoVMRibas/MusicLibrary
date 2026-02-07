@@ -72,9 +72,17 @@ public class Artist
 
     public void RemoveMusic(Guid musicId)
     {
+        if(IsMusicInAnyAlbum(musicId)) 
+            throw new MusicInAlbumException();
+        
         var music = GetMusicById(musicId);
 
         _musics.Remove(music);
+    }
+
+    private bool IsMusicInAnyAlbum(Guid musicId)
+    {
+        return _albums.Any(a => a.Musics.Any(m => m.Id == musicId));
     }
 
     public void AddMusicToAlbum(Guid albumId, Guid musicId)
