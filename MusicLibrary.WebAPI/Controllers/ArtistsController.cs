@@ -16,7 +16,7 @@ public class ArtistsController : ControllerBase
         _artistService = artistService; 
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var artist = await _artistService.GetByIdAsync(id);

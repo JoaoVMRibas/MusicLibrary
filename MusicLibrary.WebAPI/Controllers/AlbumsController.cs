@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MusicLibrary.Application.Abstractions.Services;
 using MusicLibrary.Application.Requests.Album;
-using MusicLibrary.Domain.Entities;
 using MusicLibrary.WebAPI.Models;
 
 namespace MusicLibrary.WebAPI.Controllers;
@@ -24,7 +23,7 @@ public class AlbumsController : ControllerBase
         return Ok(albums);
     }
 
-    [HttpGet("{albumId}")]
+    [HttpGet("{albumId:guid}")]
     public async Task<IActionResult> GetAlbumById(Guid artistId, Guid albumId)
     {
         var album = await _albumService.GetAlbumByIdAsync(artistId, albumId);
