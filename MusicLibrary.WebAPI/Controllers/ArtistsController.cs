@@ -10,10 +10,12 @@ namespace MusicLibrary.WebAPI.Controllers;
 public class ArtistsController : ControllerBase
 {
     private readonly IArtistService _artistService;
-    
-    public ArtistsController(IArtistService artistService) 
+    private readonly IMusicService _musicService;
+
+    public ArtistsController(IArtistService artistService,IMusicService musicService) 
     {  
         _artistService = artistService; 
+        _musicService = musicService;
     }
 
     [HttpGet("{id:guid}")]
@@ -43,6 +45,13 @@ public class ArtistsController : ControllerBase
     {
         var artist = await _artistService.UpdateAsync(id,request);
         return Ok(artist);
+    }
+
+    [HttpPost("{artistId:guid}/albums/{albumId:guid}/musics/{musicId:guid}")]
+    public async Task<IActionResult> AddMusicToAlbum(Guid artistId, Guid albumId, Guid musicId)
+    {
+        await _musicService.AddMusicToAlbumAsync(artistId, albumId, musicId);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
