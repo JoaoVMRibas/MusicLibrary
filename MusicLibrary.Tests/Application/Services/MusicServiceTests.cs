@@ -168,4 +168,25 @@ public class MusicServiceTests
 
         await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
     }
+
+    [Fact]
+    public async Task RemoveMusicFromAlbumAsync_Should_Remove_Music_From_Album()
+    {
+        //Arrage
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("Ride the Lightning");
+        var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
+
+        //Act
+        Assert.Single(album.Musics);
+        await _musicService.RemoveMusicFromAlbumAsync(artist.Id, album.Id, music.Id);
+
+        //Assert
+        Assert.Empty(album.Musics);
+
+        await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
+    }
 }
