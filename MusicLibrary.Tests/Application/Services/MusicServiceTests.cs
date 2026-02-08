@@ -64,12 +64,11 @@ public class MusicServiceTests
         //Arrage
         var artist = new Artist("Metallica");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new GetMusicByIdRequest(artist.Id, music.Id);
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _musicService.GetMusicByIdAsync(request);
+        var response = await _musicService.GetMusicByIdAsync(artist.Id, music.Id);
 
         //Assert
         Assert.NotNull(response);
@@ -83,12 +82,11 @@ public class MusicServiceTests
     {
         //Arrage
         var artist = new Artist("Metallica");
-        var request = new GetMusicByIdRequest(artist.Id, Guid.NewGuid());
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.GetMusicByIdAsync(request));
+        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.GetMusicByIdAsync(artist.Id, Guid.NewGuid()));
 
         //Assert
         Assert.Contains("Music not found", exception.Message);
@@ -101,12 +99,11 @@ public class MusicServiceTests
         var artist = new Artist("Metallica");
         artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
         artist.AddMusic("The Unforgiven", TimeSpan.FromSeconds(388));
-        var request = new GetMusicsByArtistRequest(artist.Id);
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var response = await _musicService.GetMusicsByArtistAsync(request);
+        var response = await _musicService.GetMusicsByArtistAsync(artist.Id);
 
         //Assert
         Assert.Equal(2, response.Count);
@@ -122,13 +119,12 @@ public class MusicServiceTests
         //Arrage
         var artist = new Artist("Metallica");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new DeleteMusicRequest(artist.Id, music.Id);
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act and Assert
         Assert.Single(artist.Musics);
-        await _musicService.DeleteMusicAsync(request);
+        await _musicService.DeleteMusicAsync(artist.Id, music.Id);
         Assert.Empty(artist.Musics);
 
         await _artistRepository.Received(1).UpdateAsync(Arg.Any<Artist>());
@@ -139,12 +135,11 @@ public class MusicServiceTests
     {
         //Arrage
         var artist = new Artist("Metallica");
-        var request = new DeleteMusicRequest(artist.Id, Guid.NewGuid());
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.DeleteMusicAsync(request));
+        var exception = await Assert.ThrowsAsync<MusicNotFoundException>(() => _musicService.DeleteMusicAsync(artist.Id, Guid.NewGuid()));
 
         //Assert
         Assert.Contains("Music not found", exception.Message);
@@ -159,12 +154,11 @@ public class MusicServiceTests
         var artist = new Artist("Metallica");
         var album = artist.AddAlbum("Ride the Lightning");
         var music = artist.AddMusic("Fade to Black", TimeSpan.FromSeconds(415));
-        var request = new AddMusicToAlbumRequest(artist.Id, album.Id, music.Id);
 
-        _artistRepository.GetByIdAsync(request.ArtistId).Returns(artist);
+        _artistRepository.GetByIdAsync(artist.Id).Returns(artist);
 
         //Act
-        await _musicService.AddMusicToAlbumAsync(request);
+        await _musicService.AddMusicToAlbumAsync(artist.Id, album.Id, music.Id);
 
         //Assert
         Assert.Single(album.Musics);
