@@ -1,5 +1,6 @@
 ﻿using MusicLibrary.Domain.Entities;
 using MusicLibrary.Domain.Exceptions;
+using System.Threading.Tasks;
 
 namespace MusicLibrary.Tests.Domain.Entities;
 
@@ -93,6 +94,7 @@ public class ArtistTests
         Assert.NotEqual(Guid.Empty, music.Id);
         Assert.Equal(musicName, music.Name);
         Assert.Equal(duration, music.Duration);
+        Assert.Equal(artist.Id, music.ArtistId);
     }
 
     [Fact]
@@ -142,7 +144,6 @@ public class ArtistTests
         Assert.Empty(artist.Musics);
     }
 
-
     [Fact]
     public void Should_Throw_Exception_When_Removing_Nonexistent_Music_From_Artist()
     {
@@ -155,6 +156,23 @@ public class ArtistTests
         //Assert
         Assert.Empty(artist.Musics);
         Assert.Contains("Music not found.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Should_Throw_Exception_When_Removing_Music_In_Album_From_Artist()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        //Act
+        var exception = Assert.Throws<MusicInAlbumException>(() => artist.RemoveMusic(music.Id));
+
+        //Assert
+        Assert.Single(artist.Musics);
+        Assert.Contains("The music is part of an album and cannot be removed.", exception.Message);
     }
 
     [Fact]
@@ -171,6 +189,7 @@ public class ArtistTests
         Assert.Single(artist.Albums);
         Assert.NotEqual(Guid.Empty, album.Id);
         Assert.Equal(albumName, album.Name);
+        Assert.Equal(artist.Id, album.ArtistId);
     }
 
     [Fact]
@@ -280,6 +299,56 @@ public class ArtistTests
         //Assert
         Assert.Single(album.Musics);
         Assert.Contains("Music already added to album.", exception.Message);
+    }
+
+    [Fact]
+    public void Should_Remove_Music_From_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        //Act
+        artist.RemoveMusicFromAlbum(album.Id, music.Id);
+
+        //Assert
+        Assert.Empty(album.Musics);
+    }
+
+    [Fact]
+    public async Task Should_Throw_Exception_When_Removing_Music_Not_In_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        //Act
+        var exception = Assert.Throws<MusicNotFoundException>(() => artist.RemoveMusicFromAlbum(album.Id, Guid.NewGuid()));
+
+        //Assert
+        Assert.Single(album.Musics);
+        Assert.Contains("Music not found.",exception.Message);
+    }
+
+    [Fact]
+    public async Task Should_Throw_Exception_When_Removing_Music_To_Nonexistent_Album()
+    {
+        //Arrange
+        var artist = new Artist("Metallica");
+        var album = artist.AddAlbum("The Black Album");
+        var music = artist.AddMusic("Enter Sandman", TimeSpan.FromSeconds(331));
+        artist.AddMusicToAlbum(album.Id, music.Id);
+
+        //Act
+        var exception = Assert.Throws<AlbumNotFoundException>(() => artist.RemoveMusicFromAlbum(Guid.NewGuid(),music.Id));
+
+        //Assert
+        Assert.Single(album.Musics);
+        Assert.Contains("Album not found.", exception.Message);
     }
 
     [Fact]
