@@ -124,7 +124,7 @@ The Web API Layer exposes the application use cases via HTTP and acts as the sys
 - Use RESTful conventions
 - Delegate all logic to Application Services
 
-#### Controllers:
+#### Controllers
 - ArtistController
   - Artist creation, retrieval, update, and deletion
   - Entry point for artist-related operations
